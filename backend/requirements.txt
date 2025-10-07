@@ -1,0 +1,25 @@
+# Core framework
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+
+# ORM / database
+sqlalchemy>=2.0.30
+
+# Data validation
+pydantic>=2.7.0
+
+# HTTP client for simulator and backend requests
+requests>=2.32.0
+
+# Rate limiting (optional but recommended)
+slowapi>=0.1.9
+
+# Security and encryption utilities
+cryptography>=42.0.0
+python-dotenv>=1.0.1
+
+# WebSocket JSON serialization
+orjson>=3.10.0
+
+# For development and logging
+rich>=13.7.1

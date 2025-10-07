@@ -1,0 +1,69 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=info
+    networks:
+      - iot-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - BROWSERSLIST=last 2 versions
+      - NODE_OPTIONS=--max-old-space-size=4096
+      # Ensure React receives the exact values at build time
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - REACT_APP_WS_URL=${REACT_APP_WS_URL}
+      - REACT_APP_WS_TOKEN=${REACT_APP_WS_TOKEN}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - iot-network
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  simulator:
+    build: ./simulator
+    depends_on:
+      backend:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - NUM_DEVICES=${NUM_DEVICES}
+      - INTERVAL=${INTERVAL}
+      - ANOMALY_PROB=${ANOMALY_PROB}
+      - BACKEND_URL=${BACKEND_URL}     # base host only
+      - API_KEY=${API_KEY}
+      - HMAC_SECRET=${HMAC_SECRET}
+    networks:
+      - iot-network
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+
+networks:
+  iot-network:
+    driver: bridge
