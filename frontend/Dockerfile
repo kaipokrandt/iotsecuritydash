@@ -1,26 +1,36 @@
-# Use Node.js
+# Use Node.js base image
 FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first for caching
+# Copy dependency manifests
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (using npm ci for reproducibility)
 RUN npm install
 
-# Copy all project files
+# Copy environment and source files
 COPY . .
 
-# Expose port
+# 🧩 Pass build-time environment variables from docker-compose
+ARG REACT_APP_API_URL
+ARG REACT_APP_WS_URL
+ARG REACT_APP_WS_TOKEN
+
+# ✅ Explicitly expose them so Create React App can see them
+ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+ENV REACT_APP_WS_URL=${REACT_APP_WS_URL}
+ENV REACT_APP_WS_TOKEN=${REACT_APP_WS_TOKEN}
+
+# Expose the frontend port
 EXPOSE 3000
 
-# Increase Node memory for large builds
+# Increase memory limit for large builds
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-# Use polling for file watching (helpful for Docker on macOS)
+# Enable polling (for macOS Docker)
 ENV CHOKIDAR_USEPOLLING=true
 
-# Start the React app
+# Start the React development server
 CMD ["npm", "start"]

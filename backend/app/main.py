@@ -31,7 +31,7 @@ def mask_secret(secret: str) -> str:
 
 API_KEY = os.getenv("API_KEY")
 HMAC_SECRET = os.getenv("HMAC_SECRET")
-WS_FRONTEND_TOKEN = os.getenv("WS_FRONTEND_TOKEN")
+WS_FRONTEND_TOKEN = (os.getenv("WS_FRONTEND_TOKEN")or "").strip()
 
 print("🔒 Security configuration:")
 print(f"  API_KEY............. {mask_secret(API_KEY)}")
@@ -262,8 +262,10 @@ def list_events(limit: int = 200, database: Session = Depends(get_db)):
 # -------------------------
 @app.websocket("/ws/events")
 async def websocket_endpoint(websocket: WebSocket):
-    token = websocket.query_params.get("token", "")
-    if WS_FRONTEND_TOKEN and token != WS_FRONTEND_TOKEN:
+    token = (websocket.query_params.get("token", "")or "").strip()
+    expected = (WS_FRONTEND_TOKEN or "").strip()
+    print(f"WebSocket connection attempt with token: {token}")
+    if expected and token != WS_FRONTEND_TOKEN:
         await websocket.close(code=1008)
         print("WebSocket rejected: invalid or missing token")
         return
