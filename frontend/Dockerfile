@@ -13,12 +13,12 @@ RUN npm install
 # Copy environment and source files
 COPY . .
 
-# 🧩 Pass build-time environment variables from docker-compose
+#  Pass build-time environment variables from docker-compose
 ARG REACT_APP_API_URL
 ARG REACT_APP_WS_URL
 ARG REACT_APP_WS_TOKEN
 
-# ✅ Explicitly expose them so Create React App can see them
+#  Explicitly expose them so Create React App can see them
 ENV REACT_APP_API_URL=${REACT_APP_API_URL}
 ENV REACT_APP_WS_URL=${REACT_APP_WS_URL}
 ENV REACT_APP_WS_TOKEN=${REACT_APP_WS_TOKEN}
