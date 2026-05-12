@@ -27,7 +27,7 @@ function App() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log("✅ WebSocket connected");
+        console.log("WebSocket connected");
         setWsConnected(true);
         retryRef.current = 1000; // reset retry
         ws.send("frontend:ready");
@@ -57,7 +57,7 @@ function App() {
       };
 
       ws.onclose = () => {
-        console.warn("⚠️ WebSocket disconnected");
+        console.warn(" WebSocket disconnected");
         setWsConnected(false);
         if (!stop) {
           // exponential backoff reconnect
